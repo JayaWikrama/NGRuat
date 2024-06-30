@@ -1,0 +1,3 @@
+[submodule "external/Balinese-Wariga"]
+	path = external/Balinese-Wariga
+	url = git@github.com:JayaWikrama/Balinese-Wariga.git
