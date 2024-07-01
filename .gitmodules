@@ -1,3 +1,6 @@
 [submodule "external/Balinese-Wariga"]
 	path = external/Balinese-Wariga
 	url = git@github.com:JayaWikrama/Balinese-Wariga.git
+[submodule "external/TgBot"]
+	path = external/TgBot
+	url = https://github.com/reo7sp/tgbot-cpp.git

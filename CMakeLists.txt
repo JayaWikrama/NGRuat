@@ -76,6 +76,7 @@ target_include_directories(${PROJECT_NAME}-lib PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/external>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/external/TgBot/include/>
   $<INSTALL_INTERFACE:include>
   ${SQLITE3_INCLUDE_DIRS}
 )
@@ -85,11 +86,15 @@ include_directories(${PROJECT_NAME}-test PUBLIC ${GTEST_INCLUDE_DIRS})
 # Ensure Balinese-Wariga is built before the executable
 add_dependencies(${PROJECT_NAME} WarigaBali-lib)
 
+# Ensure TGBot is built before the executable
+add_dependencies(${PROJECT_NAME} TgBot)
+
 # Link the executable with the library
-target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}-lib WarigaBali-lib)
-target_link_libraries(${PROJECT_NAME} PUBLIC ${SQLITE3_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}-lib WarigaBali-lib ${CMAKE_CURRENT_SOURCE_DIR}/build/external/TgBot/libTgBot.a)
+target_link_libraries(${PROJECT_NAME} PUBLIC ${SQLITE3_LIBRARIES} -lssl -lcrypto -lcurl)
 
 add_subdirectory(external/Balinese-Wariga EXCLUDE_FROM_ALL)
+add_subdirectory(external/TgBot EXCLUDE_FROM_ALL)
 
 # Link Unit Test executable with the library
 #target_link_libraries(${PROJECT_NAME}-test PRIVATE ${PROJECT_NAME}-lib)

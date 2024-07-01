@@ -2,6 +2,7 @@
 #include <regex>
 
 #include "ruwatan.hpp"
+#include "tgbot/tgbot.h"
 
 Ruwatan ruwat;
 
@@ -52,27 +53,73 @@ std::string generateRuwatanMd(){
     return result;
 }
 
+std::string parseWord(const std::string input, int idxWord){
+    std::string result = "";
+    /* skip word */
+    int skipCnt = 0;
+    int idx = 0;
+    while (skipCnt < idxWord && idx < input.length()) {
+        if (input[idx] == ' '){
+            skipCnt++;
+        }
+        idx++;
+    }
+    if (skipCnt == idxWord){
+        while (idx < input.length()){
+            if (input[idx] == ' ') break;
+            result.append(1, input[idx]);
+            idx++;
+        }
+    }
+    return result;
+}
+
 int main(int argc, char **argv){
     char *buffer = NULL;
-    if (argc < 3){
-        printf("cmd: %s namaYajamana <YYYY-MM-DD>\n", argv[0]);
-        printf("cmd: %s namaYajamana <wuku> <rahina>\n", argv[0]);
+    if (argc < 2){
+        printf("cmd: %s <Telegram Bot Token>\n", argv[0]);
         exit (0);
     }
-    int ret = 0;
-    if (argc == 3){
-        ret = ruwat.setup(argv[1], argv[2]);
-    }
-    else {
-        ret = ruwat.setup(argv[1], argv[2], argv[3]);
-    }
-    if (!ret){
-        std::cout << generateRuwatanMd() << std::endl;
-    }
-    else {
-        std::cout << "Invalid Format dengan return: " << ret << std::endl;
-        printf("cmd: %s <YYYY-MM-DD>\n", argv[0]);
-        printf("cmd: %s <wuku> <rahina>\n", argv[0]);
+    TgBot::Bot bot(argv[1]);
+    bot.getEvents().onAnyMessage([&bot](TgBot::Message::Ptr message) {
+        printf("User wrote %s\n", message->text.c_str());
+        bot.getApi().sendMessage(message->chat->id, "Your message is: " + message->text);
+        if (StringTools::startsWith(message->text, "Ruwat") ||
+            StringTools::startsWith(message->text, "ruwat") ||
+            StringTools::startsWith(message->text, "ngeruwat") ||
+            StringTools::startsWith(message->text, "Ngeruwat")
+        ) {
+            std::string name = parseWord(message->text, 1);
+            std::string btime1 = parseWord(message->text, 2);
+            std::string btime2 = parseWord(message->text, 3);
+            int ret = 0;
+            if (btime2 == ""){
+                ret = ruwat.setup(name, btime1);
+            }
+            else {
+                ret = ruwat.setup(name, btime1, btime2);
+            }
+            if (!ret){
+                std::string result = generateRuwatanMd();
+                std::cout << result << std::endl;
+                bot.getApi().sendMessage(message->chat->id, ruwat.getName() + " " + ruwat.getBirthInfo());
+            }
+            else {
+                bot.getApi().sendMessage(message->chat->id, "Invalid Arg\n\n Arg: Ruwat <name> <date> | Ruwat <name> <wuku> <rahina>");
+            }
+            return;
+        }
+        bot.getApi().sendMessage(message->chat->id, "Your message is: " + message->text);
+    });
+    try {
+        printf("Bot username: %s\n", bot.getApi().getMe()->username.c_str());
+        TgBot::TgLongPoll longPoll(bot);
+        while (true) {
+            printf("Long poll started\n");
+            longPoll.start();
+        }
+    } catch (TgBot::TgException& e) {
+        printf("error: %s\n", e.what());
     }
     return 0;
 }
