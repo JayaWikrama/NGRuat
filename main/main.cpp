@@ -6,22 +6,32 @@
 
 Ruwatan ruwat;
 
-std::string generateYadnyaDetail(std::string type, std::string name, std::string bebanten, std::string mantra){
+typedef enum _RUWAT_DATA_TYPE_t {
+    RUWAT_TYPE_ALL = 0,
+    RUWAT_TYPE_BEBANTEN,
+    RUWAT_TYPE_MANTRA
+} RUWAT_DATA_TYPE_t;
+
+std::string generateYadnyaDetail(RUWAT_DATA_TYPE_t ruwatType, std::string type, std::string name, std::string bebanten, std::string mantra){
     std::string result = "";
     if (bebanten.length() == 0 && mantra.length() == 0) return result;
     result += "### " + type + ": " + name + "\n";
     if (bebanten.length() > 0){
-        result += "#### Bebanten/Sarana\n";
-        result += bebanten + "\n";
+        if (ruwatType == RUWAT_TYPE_ALL || ruwatType == RUWAT_TYPE_BEBANTEN){
+            result += "#### Bebanten/Sarana\n";
+            result += bebanten + "\n";
+        }
     }
     if (mantra.length() > 0){
-        result += "#### Mantra\n";
-        result += mantra + "\n";
+        if (ruwatType == RUWAT_TYPE_ALL || ruwatType == RUWAT_TYPE_MANTRA){
+            result += "#### Mantra\n";
+            result += mantra + "\n";
+        }
     }
     return result;
 }
 
-std::string generateRuwatanMd(){
+std::string generateRuwatanMd(RUWAT_DATA_TYPE_t ruwatType){
     std::string result = "# Ruwatan | Mantra dan Bebanten\n";
     result += "Ruwatan memiliki arti “dilepas” atau “dibebaskan”. Oleh karena itu, Ruwatan merupakan upacara yang bertujuan membebaskan seseorang yang diruwat dari hukuman atau kutukan dewa ataupun hutang piutang di kehidupan masa lalu yang membawa bahaya.\n";
     result += "## Identitas Yajamana\n";
@@ -29,25 +39,25 @@ std::string generateRuwatanMd(){
     result += "Kelahiran: " + ruwat.getBirthInfo() + "\n";
     result += "## Ruwatan\n";
     std::string tmp = "";
-    tmp = generateYadnyaDetail("Eka Wara", ruwat.ekaWara.getName(), ruwat.ekaWara.getSacrificeInfo(), ruwat.ekaWara.getSpell());
+    tmp = generateYadnyaDetail(ruwatType, "Eka Wara", ruwat.ekaWara.getName(), ruwat.ekaWara.getSacrificeInfo(), ruwat.ekaWara.getSpell());
     if (tmp.length() > 5) result += tmp;
-    tmp = generateYadnyaDetail("Dwi Wara", ruwat.dwiWara.getName(), ruwat.dwiWara.getSacrificeInfo(), ruwat.dwiWara.getSpell());
+    tmp = generateYadnyaDetail(ruwatType, "Dwi Wara", ruwat.dwiWara.getName(), ruwat.dwiWara.getSacrificeInfo(), ruwat.dwiWara.getSpell());
     if (tmp.length() > 5) result += tmp;
-    tmp = generateYadnyaDetail("Tri Wara", ruwat.triWara.getName(), ruwat.triWara.getSacrificeInfo(), ruwat.triWara.getSpell());
+    tmp = generateYadnyaDetail(ruwatType, "Tri Wara", ruwat.triWara.getName(), ruwat.triWara.getSacrificeInfo(), ruwat.triWara.getSpell());
     if (tmp.length() > 5) result += tmp;
-    tmp = generateYadnyaDetail("Catur Wara", ruwat.caturWara.getName(), ruwat.caturWara.getSacrificeInfo(), ruwat.caturWara.getSpell());
+    tmp = generateYadnyaDetail(ruwatType, "Catur Wara", ruwat.caturWara.getName(), ruwat.caturWara.getSacrificeInfo(), ruwat.caturWara.getSpell());
     if (tmp.length() > 5) result += tmp;
-    tmp = generateYadnyaDetail("Panca Wara", ruwat.pancaWara.getName(), ruwat.pancaWara.getSacrificeInfo(), ruwat.pancaWara.getSpell());
+    tmp = generateYadnyaDetail(ruwatType, "Panca Wara", ruwat.pancaWara.getName(), ruwat.pancaWara.getSacrificeInfo(), ruwat.pancaWara.getSpell());
     if (tmp.length() > 5) result += tmp;
-    tmp = generateYadnyaDetail("Sad Wara", ruwat.sadWara.getName(), ruwat.sadWara.getSacrificeInfo(), ruwat.sadWara.getSpell());
+    tmp = generateYadnyaDetail(ruwatType, "Sad Wara", ruwat.sadWara.getName(), ruwat.sadWara.getSacrificeInfo(), ruwat.sadWara.getSpell());
     if (tmp.length() > 5) result += tmp;
-    tmp = generateYadnyaDetail("Sapta Wara", ruwat.saptaWara.getName(), ruwat.saptaWara.getSacrificeInfo(), ruwat.saptaWara.getSpell());
+    tmp = generateYadnyaDetail(ruwatType, "Sapta Wara", ruwat.saptaWara.getName(), ruwat.saptaWara.getSacrificeInfo(), ruwat.saptaWara.getSpell());
     if (tmp.length() > 5) result += tmp;
-    tmp = generateYadnyaDetail("Asta Wara", ruwat.astaWara.getName(), ruwat.astaWara.getSacrificeInfo(), ruwat.astaWara.getSpell());
+    tmp = generateYadnyaDetail(ruwatType, "Asta Wara", ruwat.astaWara.getName(), ruwat.astaWara.getSacrificeInfo(), ruwat.astaWara.getSpell());
     if (tmp.length() > 5) result += tmp;
-    tmp = generateYadnyaDetail("Sanga Wara", ruwat.sangaWara.getName(), ruwat.sangaWara.getSacrificeInfo(), ruwat.sangaWara.getSpell());
+    tmp = generateYadnyaDetail(ruwatType, "Sanga Wara", ruwat.sangaWara.getName(), ruwat.sangaWara.getSacrificeInfo(), ruwat.sangaWara.getSpell());
     if (tmp.length() > 5) result += tmp;
-    tmp = generateYadnyaDetail("Dasa Wara", ruwat.dasaWara.getName(), ruwat.dasaWara.getSacrificeInfo(), ruwat.dasaWara.getSpell());
+    tmp = generateYadnyaDetail(ruwatType, "Dasa Wara", ruwat.dasaWara.getName(), ruwat.dasaWara.getSacrificeInfo(), ruwat.dasaWara.getSpell());
     if (tmp.length() > 5) result += tmp;
     result = std::regex_replace(result, std::regex("\n"), "\n\n");
     return result;
@@ -100,9 +110,12 @@ int main(int argc, char **argv){
                 ret = ruwat.setup(name, btime1, btime2);
             }
             if (!ret){
-                std::string result = generateRuwatanMd();
+                std::string result = generateRuwatanMd(RUWAT_TYPE_BEBANTEN);
                 std::cout << result << std::endl;
-                bot.getApi().sendMessage(message->chat->id, ruwat.getName() + " " + ruwat.getBirthInfo());
+                bot.getApi().sendMessage(message->chat->id, result);
+                result = generateRuwatanMd(RUWAT_TYPE_MANTRA);
+                std::cout << result << std::endl;
+                bot.getApi().sendMessage(message->chat->id, result);
             }
             else {
                 bot.getApi().sendMessage(message->chat->id, "Invalid Arg\n\n Arg: Ruwat <name> <date> | Ruwat <name> <wuku> <rahina>");
