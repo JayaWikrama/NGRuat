@@ -48,6 +48,7 @@ pkg_check_modules(SQLITE3 REQUIRED sqlite3)
 set(SOURCE_FILES
     src/data.cpp
     src/ruwatan.cpp
+    src/document.cpp
 )
 
 # Create a library from common code
@@ -91,7 +92,7 @@ add_dependencies(${PROJECT_NAME} TgBot)
 
 # Link the executable with the library
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}-lib WarigaBali-lib ${CMAKE_CURRENT_SOURCE_DIR}/build/external/TgBot/libTgBot.a)
-target_link_libraries(${PROJECT_NAME} PUBLIC ${SQLITE3_LIBRARIES} -lssl -lcrypto -lcurl)
+target_link_libraries(${PROJECT_NAME} PUBLIC ${SQLITE3_LIBRARIES} -lssl -lcrypto -lcurl -lpthread)
 
 add_subdirectory(external/Balinese-Wariga EXCLUDE_FROM_ALL)
 add_subdirectory(external/TgBot EXCLUDE_FROM_ALL)

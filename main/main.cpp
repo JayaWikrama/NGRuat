@@ -3,6 +3,7 @@
 
 #include "ruwatan.hpp"
 #include "tgbot/tgbot.h"
+#include "document.hpp"
 
 Ruwatan ruwat;
 
@@ -11,6 +12,8 @@ typedef enum _RUWAT_DATA_TYPE_t {
     RUWAT_TYPE_BEBANTEN,
     RUWAT_TYPE_MANTRA
 } RUWAT_DATA_TYPE_t;
+
+/* Markdown Format */
 
 std::string generateYadnyaDetail(RUWAT_DATA_TYPE_t ruwatType, std::string type, std::string name, std::string bebanten, std::string mantra){
     std::string result = "";
@@ -84,11 +87,78 @@ std::string parseWord(const std::string input, int idxWord){
     return result;
 }
 
+/* Document (HTML) Format */
+
+void addYadnyaDetailDoc(RUWAT_DATA_TYPE_t ruwatType, Document &doc, std::string type, std::string name, std::string bebanten, std::string mantra){
+    if (bebanten.length() == 0 && mantra.length() == 0) return;
+    doc.addLine(Document::HEADING_3, type + ": " + name);
+    if (bebanten.length() > 0 &&
+        (ruwatType == RUWAT_TYPE_ALL || ruwatType == RUWAT_TYPE_BEBANTEN)
+    ){
+        doc.addLine(Document::HEADING_4, "Bebanten/Sarana");
+        doc.addLine(Document::BODY, bebanten);
+    }
+    if (mantra.length() > 0 &&
+        (ruwatType == RUWAT_TYPE_ALL || ruwatType == RUWAT_TYPE_MANTRA)
+    ){
+        doc.addLine(Document::HEADING_4, "Mantra");
+        doc.addLine(Document::BODY, mantra);
+    }
+}
+
+void generateRuwatanDoc(RUWAT_DATA_TYPE_t ruwatType){
+    Document doc;
+    doc.setTitle(ruwat.getName() + "_" + ruwat.getBirthInfo());
+    doc.setHeadingStyle("Arial, sans-serif", "#444444");
+    doc.setBodyStyle("Arial, sans-serif", "#222222", 11);
+    doc.addLine(Document::HEADING_1, "Ruwatan | Mantra dan Bebanten");
+    doc.addLine(Document::BODY, "Ruwatan memiliki arti \"dilepas\" atau \"dibebaskan\". Oleh karena itu, Ruwatan merupakan upacara yang bertujuan membebaskan seseorang yang diruwat dari hukuman atau kutukan dewa ataupun hutang piutang di kehidupan masa lalu yang membawa bahaya.");
+    doc.addLine(Document::HEADING_2, "Identitas Yajamana");
+    doc.addLine(Document::BODY, "Nama: " + ruwat.getName());
+    doc.addLine(Document::BODY, "Kelahiran: " + ruwat.getBirthInfo());
+    doc.addLine(Document::HEADING_2, "Ruwatan");
+    std::cout << doc.getPayload() << std::endl;
+    doc.writeDocument(ruwat.getName() + "_" + ruwat.getBirthInfo() + ".doc");
+    addYadnyaDetailDoc(ruwatType, doc, "Eka Wara", ruwat.ekaWara.getName(), ruwat.ekaWara.getSacrificeInfo(), ruwat.ekaWara.getSpell());
+    addYadnyaDetailDoc(ruwatType, doc, "Dwi Wara", ruwat.dwiWara.getName(), ruwat.dwiWara.getSacrificeInfo(), ruwat.dwiWara.getSpell());
+    addYadnyaDetailDoc(ruwatType, doc, "Tri Wara", ruwat.triWara.getName(), ruwat.triWara.getSacrificeInfo(), ruwat.triWara.getSpell());
+    addYadnyaDetailDoc(ruwatType, doc, "Catur Wara", ruwat.caturWara.getName(), ruwat.caturWara.getSacrificeInfo(), ruwat.caturWara.getSpell());
+    addYadnyaDetailDoc(ruwatType, doc, "Panca Wara", ruwat.pancaWara.getName(), ruwat.pancaWara.getSacrificeInfo(), ruwat.pancaWara.getSpell());
+    addYadnyaDetailDoc(ruwatType, doc, "Sad Wara", ruwat.sadWara.getName(), ruwat.sadWara.getSacrificeInfo(), ruwat.sadWara.getSpell());
+    addYadnyaDetailDoc(ruwatType, doc, "Sapta Wara", ruwat.saptaWara.getName(), ruwat.saptaWara.getSacrificeInfo(), ruwat.saptaWara.getSpell());
+    addYadnyaDetailDoc(ruwatType, doc, "Asta Wara", ruwat.astaWara.getName(), ruwat.astaWara.getSacrificeInfo(), ruwat.astaWara.getSpell());
+    addYadnyaDetailDoc(ruwatType, doc, "Sanga Wara", ruwat.sangaWara.getName(), ruwat.sangaWara.getSacrificeInfo(), ruwat.sangaWara.getSpell());
+    addYadnyaDetailDoc(ruwatType, doc, "Dasa Wara", ruwat.dasaWara.getName(), ruwat.dasaWara.getSacrificeInfo(), ruwat.dasaWara.getSpell());
+    std::cout << doc.getPayload() << std::endl;
+    doc.writeDocument(ruwat.getName() + "_" + ruwat.getBirthInfo() + ".doc");
+}
+
 int main(int argc, char **argv){
     char *buffer = NULL;
     if (argc < 2){
         printf("cmd: %s <Telegram Bot Token>\n", argv[0]);
+        printf("cmd: %s namaYajamana <YYYY-MM-DD>\n", argv[0]);
+        printf("cmd: %s namaYajamana <wuku> <rahina>\n", argv[0]);
         exit (0);
+    }
+    if (argc > 2){
+        int ret = 0;
+        if (argc == 3){
+            ret = ruwat.setup(argv[1], argv[2]);
+        }
+        else {
+            ret = ruwat.setup(argv[1], argv[2], argv[3]);
+        }
+        if (!ret){
+            generateRuwatanDoc(RUWAT_TYPE_ALL);
+        }
+        else {
+            std::cout << "Invalid Format dengan return: " << ret << std::endl;
+            printf("cmd: %s <Telegram Bot Token>\n", argv[0]);
+            printf("cmd: %s namaYajamana <YYYY-MM-DD>\n", argv[0]);
+            printf("cmd: %s namaYajamana <wuku> <rahina>\n", argv[0]);
+        }
+        exit(0);
     }
     TgBot::Bot bot(argv[1]);
     bot.getEvents().onAnyMessage([&bot](TgBot::Message::Ptr message) {
