@@ -1,5 +1,6 @@
 #include <iostream>
 #include <regex>
+#include <string>
 
 #include "ruwatan.hpp"
 #include "tgbot/tgbot.h"
@@ -12,6 +13,14 @@ typedef enum _RUWAT_DATA_TYPE_t {
     RUWAT_TYPE_BEBANTEN,
     RUWAT_TYPE_MANTRA
 } RUWAT_DATA_TYPE_t;
+
+RUWAT_DATA_TYPE_t ruwatType = RUWAT_TYPE_ALL;
+
+TgBot::ReplyKeyboardMarkup::Ptr contentType(new TgBot::ReplyKeyboardMarkup);
+TgBot::ReplyKeyboardMarkup::Ptr documentType(new TgBot::ReplyKeyboardMarkup);
+TgBot::InputFile fileTgBot;
+
+std::string fileTitle;
 
 /* Markdown Format */
 
@@ -106,9 +115,9 @@ void addYadnyaDetailDoc(RUWAT_DATA_TYPE_t ruwatType, Document &doc, std::string 
     }
 }
 
-void generateRuwatanDoc(RUWAT_DATA_TYPE_t ruwatType){
+std::string generateRuwatanDoc(RUWAT_DATA_TYPE_t ruwatType){
     Document doc;
-    doc.setTitle(ruwat.getName() + "_" + ruwat.getBirthInfo());
+    doc.setTitle(fileTitle);
     doc.setHeadingStyle("Arial, sans-serif", "#444444");
     doc.setBodyStyle("Arial, sans-serif", "#222222", 11);
     doc.addLine(Document::HEADING_1, "Ruwatan | Mantra dan Bebanten");
@@ -117,8 +126,6 @@ void generateRuwatanDoc(RUWAT_DATA_TYPE_t ruwatType){
     doc.addLine(Document::BODY, "Nama: " + ruwat.getName());
     doc.addLine(Document::BODY, "Kelahiran: " + ruwat.getBirthInfo());
     doc.addLine(Document::HEADING_2, "Ruwatan");
-    std::cout << doc.getPayload() << std::endl;
-    doc.writeDocument(ruwat.getName() + "_" + ruwat.getBirthInfo() + ".doc");
     addYadnyaDetailDoc(ruwatType, doc, "Eka Wara", ruwat.ekaWara.getName(), ruwat.ekaWara.getSacrificeInfo(), ruwat.ekaWara.getSpell());
     addYadnyaDetailDoc(ruwatType, doc, "Dwi Wara", ruwat.dwiWara.getName(), ruwat.dwiWara.getSacrificeInfo(), ruwat.dwiWara.getSpell());
     addYadnyaDetailDoc(ruwatType, doc, "Tri Wara", ruwat.triWara.getName(), ruwat.triWara.getSacrificeInfo(), ruwat.triWara.getSpell());
@@ -129,8 +136,17 @@ void generateRuwatanDoc(RUWAT_DATA_TYPE_t ruwatType){
     addYadnyaDetailDoc(ruwatType, doc, "Asta Wara", ruwat.astaWara.getName(), ruwat.astaWara.getSacrificeInfo(), ruwat.astaWara.getSpell());
     addYadnyaDetailDoc(ruwatType, doc, "Sanga Wara", ruwat.sangaWara.getName(), ruwat.sangaWara.getSacrificeInfo(), ruwat.sangaWara.getSpell());
     addYadnyaDetailDoc(ruwatType, doc, "Dasa Wara", ruwat.dasaWara.getName(), ruwat.dasaWara.getSacrificeInfo(), ruwat.dasaWara.getSpell());
-    std::cout << doc.getPayload() << std::endl;
-    doc.writeDocument(ruwat.getName() + "_" + ruwat.getBirthInfo() + ".doc");
+    return doc.getPayload();
+}
+
+void createOneColumnKeyboard(const std::vector<std::string>& buttonStrings, TgBot::ReplyKeyboardMarkup::Ptr& kb){
+  for (size_t i = 0; i < buttonStrings.size(); ++i) {
+    std::vector<TgBot::KeyboardButton::Ptr> row;
+    TgBot::KeyboardButton::Ptr button(new TgBot::KeyboardButton);
+    button->text = buttonStrings[i];
+    row.push_back(button);
+    kb->keyboard.push_back(row);
+  }
 }
 
 int main(int argc, char **argv){
@@ -161,9 +177,9 @@ int main(int argc, char **argv){
         exit(0);
     }
     TgBot::Bot bot(argv[1]);
+    createOneColumnKeyboard({"Banten dan Mantra", "Bebanten", "Mantra"}, contentType);
+    createOneColumnKeyboard({"Markdown", "Document", "Back"}, documentType);
     bot.getEvents().onAnyMessage([&bot](TgBot::Message::Ptr message) {
-        printf("User wrote %s\n", message->text.c_str());
-        bot.getApi().sendMessage(message->chat->id, "Your message is: " + message->text);
         if (StringTools::startsWith(message->text, "Ruwat") ||
             StringTools::startsWith(message->text, "ruwat") ||
             StringTools::startsWith(message->text, "ngeruwat") ||
@@ -180,19 +196,61 @@ int main(int argc, char **argv){
                 ret = ruwat.setup(name, btime1, btime2);
             }
             if (!ret){
-                std::string result = generateRuwatanMd(RUWAT_TYPE_BEBANTEN);
-                std::cout << result << std::endl;
-                bot.getApi().sendMessage(message->chat->id, result);
-                result = generateRuwatanMd(RUWAT_TYPE_MANTRA);
-                std::cout << result << std::endl;
-                bot.getApi().sendMessage(message->chat->id, result);
+                bot.getApi().sendMessage(message->chat->id, "Pilih Jenis Konten Ruwatan", nullptr, nullptr, contentType);
+                fileTitle = ruwat.getName() + " - " + ruwat.getBirthInfo();
             }
             else {
                 bot.getApi().sendMessage(message->chat->id, "Invalid Arg\n\n Arg: Ruwat <name> <date> | Ruwat <name> <wuku> <rahina>");
             }
             return;
         }
-        bot.getApi().sendMessage(message->chat->id, "Your message is: " + message->text);
+        else if (StringTools::startsWith(message->text, "Banten dan Mantra")) {
+            ruwatType = RUWAT_TYPE_ALL;
+            bot.getApi().sendMessage(message->chat->id, "Pilih Jenis Dokumen Banten dan Mantra yang Ingin Dibuat", nullptr, nullptr, documentType);
+            fileTitle += " - Lengkap";
+            return;
+        }
+        else if (StringTools::startsWith(message->text, "Bebanten")) {
+            ruwatType = RUWAT_TYPE_BEBANTEN;
+            bot.getApi().sendMessage(message->chat->id, "Pilih Jenis Dokumen Bebanten yang Ingin Dibuat", nullptr, nullptr, documentType);
+            fileTitle += " - Bebanten";
+            return;
+        }
+        else if (StringTools::startsWith(message->text, "Mantra")) {
+            ruwatType = RUWAT_TYPE_BEBANTEN;
+            bot.getApi().sendMessage(message->chat->id, "Pilih Jenis Dokumen Mantra yang Ingin Dibuat", nullptr, nullptr, documentType);
+            fileTitle += " - Mantra";
+            return;
+        }
+        else if (StringTools::startsWith(message->text, "Markdown")) {
+            std::transform(fileTitle.begin(), fileTitle.end(), fileTitle.begin(), ::toupper);
+            std::string result = generateRuwatanMd(ruwatType);
+            fileTgBot.data = result;
+            fileTgBot.fileName = fileTitle + ".md";
+            fileTgBot.mimeType = "text/utf-8";
+            TgBot::InputFile::Ptr fPtr = std::make_shared<TgBot::InputFile>(fileTgBot);
+            bot.getApi().sendDocument(message->chat->id, fPtr);
+            return;
+        }
+        else if (StringTools::startsWith(message->text, "Document")) {
+            std::transform(fileTitle.begin(), fileTitle.end(), fileTitle.begin(), ::toupper);
+            std::string result = generateRuwatanDoc(ruwatType);
+            fileTgBot.data = result;
+            fileTgBot.fileName = fileTitle + ".doc";
+            fileTgBot.mimeType = "text/html";
+            TgBot::InputFile::Ptr fPtr = std::make_shared<TgBot::InputFile>(fileTgBot);
+            bot.getApi().sendDocument(message->chat->id, fPtr);
+            return;
+        }
+        else if (StringTools::startsWith(message->text, "Back")) {
+            fileTitle = ruwat.getName() + " - " + ruwat.getBirthInfo();
+            bot.getApi().sendMessage(message->chat->id, "Pilih Jenis Konten Ruwatan", nullptr, nullptr, contentType);
+            return;
+        }
+        else {
+            bot.getApi().sendMessage(message->chat->id, "Your message is: " + message->text);
+            return;
+        }
     });
     try {
         printf("Bot username: %s\n", bot.getApi().getMe()->username.c_str());
