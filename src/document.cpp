@@ -15,13 +15,13 @@
  * 
  */
 Document::Document(){
+  this->docType = static_cast<unsigned int>(Document::PLAIN_TEXT);
   this->fontSize = 12;
   this->headingFontColor = "#555555";
   this->headingFontFamily = "Arial, sans-serif";
   this->bodyFontColor = "#000000";
   this->bodyFontFamily = "Arial, sans-serif";
   this->title = "New Document";
-  this->body = "";
 }
 
 /**
@@ -31,6 +31,16 @@ Document::Document(){
  */
 Document::~Document(){
 
+}
+
+/**
+ * @brief Setter untuk Tipe Dokumen yang akan dibangun.
+ *
+ * Berfungsi untuk melakukan setup tipe dokumen yang akan dibuat. Method ini dapat dipanggil sebelum memangil method __Document::getPayload__ atau __Document::writeDocument__.
+ * @param type merepresentasikan jenis dokumen yang akan dibuat.
+ */
+void Document::setDocumentType(Document::DOCUMENT_TYPE_t type){
+  this->docType = static_cast<unsigned int>(type);
 }
 
 /**
@@ -77,13 +87,8 @@ void Document::setBodyStyle(const std::string fontFamily, const std::string font
  * @param text konten baris baru yang akan ditambahkan.
  */
 void Document::addLine(Document::TEXT_TYPE_t lineType, const std::string text){
-  std::string tmp = "";
-  if (lineType == Document::BODY){
-    this->body += "\n<p>" + text + "</p>";
-  }
-  else {
-    this->body += "\n<h" + std::to_string(lineType + 1) + ">" + text + "</h" + std::to_string(lineType + 1) + ">";
-  }
+  struct body_t line = {static_cast<unsigned int>(lineType), text};
+  this->body.push_back(line);
 }
 
 /**
@@ -93,6 +98,31 @@ void Document::addLine(Document::TEXT_TYPE_t lineType, const std::string text){
  * @return keseluruhan isi dokumen yang telah disusun.
  */
 std::string Document::getPayload(){
+  std::string body;
+  for (auto i = this->body.begin(); i != this->body.end(); i++){
+    if (static_cast<Document::DOCUMENT_TYPE_t>(this->docType) == Document::PLAIN_TEXT){
+      body += (*i).text + "\n";
+    }
+    else if (static_cast<Document::DOCUMENT_TYPE_t>(this->docType) == Document::DOCUMENT){
+      if (static_cast<Document::TEXT_TYPE_t>((*i).type) == BODY){
+        body += "<p>" + (*i).text + "</p>";
+      }
+      else {
+        body += "<h" + std::to_string((*i).type + 1) + ">" + (*i).text + "</h" + std::to_string((*i).type + 1) + ">";
+      }
+    }
+    else {
+      if (static_cast<Document::TEXT_TYPE_t>((*i).type) == BODY){
+        body += (*i).text + "\n\n";
+      }
+      else {
+        for (int j = 0; j <= (*i).type; j++){
+          body += "#";
+        }
+        body += " " + (*i).text + "\n\n";
+      }
+    }
+  }
   std::string result = std::string("<html>") +
                        std::string("<head>") +
                        std::string("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">") +
@@ -108,7 +138,7 @@ std::string Document::getPayload(){
                        std::string("</style>") +
                        std::string("</head>") +
                        std::string("<body>\n") +
-                       this->body +
+                       body +
                        std::string("\n</body>") +
                        std::string("</html>");
 

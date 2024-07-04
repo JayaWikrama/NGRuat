@@ -1,18 +1,24 @@
 #ifndef __DOCUMENT_HPP__
 #define __DOCUMENT_HPP__
 
+#include <vector>
 #include <ctime>
 #include <string>
 
 class Document {
   private:
+    struct body_t {
+      unsigned int type;
+      std::string text;
+    };
+    unsigned int docType;
     int fontSize;
     std::string headingFontColor;
     std::string headingFontFamily;
     std::string bodyFontColor;
     std::string bodyFontFamily;
     std::string title;
-    std::string body;
+    std::vector<struct body_t> body;
 
   public:
     typedef enum _TEXT_TYPE_t {
@@ -22,6 +28,11 @@ class Document {
       HEADING_4,
       BODY
     } TEXT_TYPE_t;
+    typedef enum _DOCUMENT_TYPE_t {
+      PLAIN_TEXT = 0,
+      DOCUMENT,
+      MARKDOWN
+    } DOCUMENT_TYPE_t;
     /**
      * @brief Default constructor.
      *
@@ -35,6 +46,14 @@ class Document {
      * Berfungsi untuk melakukan release setiap memory yang dialokasikan.
      */
     ~Document();
+
+    /**
+     * @brief Setter untuk Tipe Dokumen yang akan dibangun.
+     *
+     * Berfungsi untuk melakukan setup tipe dokumen yang akan dibuat. Method ini dapat dipanggil sebelum memangil method __Document::getPayload__ atau __Document::writeDocument__.
+     * @param type merepresentasikan jenis dokumen yang akan dibuat.
+     */
+    void setDocumentType(Document::DOCUMENT_TYPE_t type);
 
     /**
      * @brief Setter untuk Title Dokumen.
