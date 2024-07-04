@@ -87,8 +87,20 @@ void Document::setBodyStyle(const std::string fontFamily, const std::string font
  * @param text konten baris baru yang akan ditambahkan.
  */
 void Document::addLine(Document::TEXT_TYPE_t lineType, const std::string text){
-  struct body_t line = {static_cast<unsigned int>(lineType), text};
-  this->body.push_back(line);
+  if (text.length() == 0){
+    struct body_t line = {static_cast<unsigned int>(lineType), text};
+    this->body.push_back(line);
+  }
+  /* Memecah text line per line berdasarkan karakter EOL yang ditemukan */
+  for (int i = 0; i < text.length(); i++){
+    std::string tmp = "";
+    while (text[i] != '\r' && text[i] != '\n' && i < text.length()){
+      tmp += text[i];
+      i++;
+    }
+    struct body_t line = {static_cast<unsigned int>(lineType), tmp};
+    this->body.push_back(line);
+  }
 }
 
 /**
