@@ -1,5 +1,4 @@
 #include <iostream>
-#include <regex>
 #include <string>
 
 #include "ruwatan.hpp"
@@ -22,59 +21,6 @@ TgBot::InputFile fileTgBot;
 
 std::string fileTitle;
 
-/* Markdown Format */
-
-std::string generateYadnyaDetail(RUWAT_DATA_TYPE_t ruwatType, std::string type, std::string name, std::string bebanten, std::string mantra){
-    std::string result = "";
-    if (bebanten.length() == 0 && mantra.length() == 0) return result;
-    result += "### " + type + ": " + name + "\n";
-    if (bebanten.length() > 0){
-        if (ruwatType == RUWAT_TYPE_ALL || ruwatType == RUWAT_TYPE_BEBANTEN){
-            result += "#### Bebanten/Sarana\n";
-            result += bebanten + "\n";
-        }
-    }
-    if (mantra.length() > 0){
-        if (ruwatType == RUWAT_TYPE_ALL || ruwatType == RUWAT_TYPE_MANTRA){
-            result += "#### Mantra\n";
-            result += mantra + "\n";
-        }
-    }
-    return result;
-}
-
-std::string generateRuwatanMd(RUWAT_DATA_TYPE_t ruwatType){
-    std::string result = "# Ruwatan | Mantra dan Bebanten\n";
-    result += "Ruwatan memiliki arti “dilepas” atau “dibebaskan”. Oleh karena itu, Ruwatan merupakan upacara yang bertujuan membebaskan seseorang yang diruwat dari hukuman atau kutukan dewa ataupun hutang piutang di kehidupan masa lalu yang membawa bahaya.\n";
-    result += "## Identitas Yajamana\n";
-    result += "Nama: " + ruwat.getName() + "\n";
-    result += "Kelahiran: " + ruwat.getBirthInfo() + "\n";
-    result += "## Ruwatan\n";
-    std::string tmp = "";
-    tmp = generateYadnyaDetail(ruwatType, "Eka Wara", ruwat.ekaWara.getName(), ruwat.ekaWara.getSacrificeInfo(), ruwat.ekaWara.getSpell());
-    if (tmp.length() > 5) result += tmp;
-    tmp = generateYadnyaDetail(ruwatType, "Dwi Wara", ruwat.dwiWara.getName(), ruwat.dwiWara.getSacrificeInfo(), ruwat.dwiWara.getSpell());
-    if (tmp.length() > 5) result += tmp;
-    tmp = generateYadnyaDetail(ruwatType, "Tri Wara", ruwat.triWara.getName(), ruwat.triWara.getSacrificeInfo(), ruwat.triWara.getSpell());
-    if (tmp.length() > 5) result += tmp;
-    tmp = generateYadnyaDetail(ruwatType, "Catur Wara", ruwat.caturWara.getName(), ruwat.caturWara.getSacrificeInfo(), ruwat.caturWara.getSpell());
-    if (tmp.length() > 5) result += tmp;
-    tmp = generateYadnyaDetail(ruwatType, "Panca Wara", ruwat.pancaWara.getName(), ruwat.pancaWara.getSacrificeInfo(), ruwat.pancaWara.getSpell());
-    if (tmp.length() > 5) result += tmp;
-    tmp = generateYadnyaDetail(ruwatType, "Sad Wara", ruwat.sadWara.getName(), ruwat.sadWara.getSacrificeInfo(), ruwat.sadWara.getSpell());
-    if (tmp.length() > 5) result += tmp;
-    tmp = generateYadnyaDetail(ruwatType, "Sapta Wara", ruwat.saptaWara.getName(), ruwat.saptaWara.getSacrificeInfo(), ruwat.saptaWara.getSpell());
-    if (tmp.length() > 5) result += tmp;
-    tmp = generateYadnyaDetail(ruwatType, "Asta Wara", ruwat.astaWara.getName(), ruwat.astaWara.getSacrificeInfo(), ruwat.astaWara.getSpell());
-    if (tmp.length() > 5) result += tmp;
-    tmp = generateYadnyaDetail(ruwatType, "Sanga Wara", ruwat.sangaWara.getName(), ruwat.sangaWara.getSacrificeInfo(), ruwat.sangaWara.getSpell());
-    if (tmp.length() > 5) result += tmp;
-    tmp = generateYadnyaDetail(ruwatType, "Dasa Wara", ruwat.dasaWara.getName(), ruwat.dasaWara.getSacrificeInfo(), ruwat.dasaWara.getSpell());
-    if (tmp.length() > 5) result += tmp;
-    result = std::regex_replace(result, std::regex("\n"), "\n\n");
-    return result;
-}
-
 std::string parseWord(const std::string input, int idxWord){
     std::string result = "";
     /* skip word */
@@ -96,8 +42,6 @@ std::string parseWord(const std::string input, int idxWord){
     return result;
 }
 
-/* Document (HTML) Format */
-
 void addYadnyaDetailDoc(RUWAT_DATA_TYPE_t ruwatType, Document &doc, std::string type, std::string name, std::string bebanten, std::string mantra){
     if (bebanten.length() == 0 && mantra.length() == 0) return;
     doc.addLine(Document::HEADING_3, type + ": " + name);
@@ -115,7 +59,7 @@ void addYadnyaDetailDoc(RUWAT_DATA_TYPE_t ruwatType, Document &doc, std::string 
     }
 }
 
-std::string generateRuwatanDoc(RUWAT_DATA_TYPE_t ruwatType){
+std::string generateRuwatanDoc(RUWAT_DATA_TYPE_t ruwatType, Document::DOCUMENT_TYPE_t docType){
     Document doc;
     doc.setTitle(fileTitle);
     doc.setHeadingStyle("Arial, sans-serif", "#444444");
@@ -136,6 +80,7 @@ std::string generateRuwatanDoc(RUWAT_DATA_TYPE_t ruwatType){
     addYadnyaDetailDoc(ruwatType, doc, "Asta Wara", ruwat.astaWara.getName(), ruwat.astaWara.getSacrificeInfo(), ruwat.astaWara.getSpell());
     addYadnyaDetailDoc(ruwatType, doc, "Sanga Wara", ruwat.sangaWara.getName(), ruwat.sangaWara.getSacrificeInfo(), ruwat.sangaWara.getSpell());
     addYadnyaDetailDoc(ruwatType, doc, "Dasa Wara", ruwat.dasaWara.getName(), ruwat.dasaWara.getSacrificeInfo(), ruwat.dasaWara.getSpell());
+    doc.setDocumentType(docType);
     return doc.getPayload();
 }
 
@@ -166,7 +111,7 @@ int main(int argc, char **argv){
             ret = ruwat.setup(argv[1], argv[2], argv[3]);
         }
         if (!ret){
-            generateRuwatanDoc(RUWAT_TYPE_ALL);
+            generateRuwatanDoc(RUWAT_TYPE_ALL, Document::DOCUMENT);
         }
         else {
             std::cout << "Invalid Format dengan return: " << ret << std::endl;
@@ -224,7 +169,7 @@ int main(int argc, char **argv){
         }
         else if (StringTools::startsWith(message->text, "Markdown")) {
             std::transform(fileTitle.begin(), fileTitle.end(), fileTitle.begin(), ::toupper);
-            std::string result = generateRuwatanMd(ruwatType);
+            std::string result = generateRuwatanDoc(ruwatType, Document::MARKDOWN);
             fileTgBot.data = result;
             fileTgBot.fileName = fileTitle + ".md";
             fileTgBot.mimeType = "text/utf-8";
@@ -234,7 +179,7 @@ int main(int argc, char **argv){
         }
         else if (StringTools::startsWith(message->text, "Document")) {
             std::transform(fileTitle.begin(), fileTitle.end(), fileTitle.begin(), ::toupper);
-            std::string result = generateRuwatanDoc(ruwatType);
+            std::string result = generateRuwatanDoc(ruwatType, Document::DOCUMENT);
             fileTgBot.data = result;
             fileTgBot.fileName = fileTitle + ".doc";
             fileTgBot.mimeType = "text/html";
