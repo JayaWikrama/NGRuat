@@ -135,6 +135,9 @@ std::string Document::getPayload(){
       }
     }
   }
+  if (static_cast<Document::DOCUMENT_TYPE_t>(this->docType) != Document::DOCUMENT){
+    return body;
+  }
   std::string result = std::string("<html>") +
                        std::string("<head>") +
                        std::string("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">") +
