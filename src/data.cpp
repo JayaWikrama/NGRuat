@@ -32,7 +32,7 @@ static int ___callback(void *_ptr, int _argc, char **_argv, char **_azColName){
       data->setSpell(std::string(_argv[idx + 1]));
     }
     else if (memcmp(_argv[idx], "Kelahiran", 9) == 0){
-      data->setBirthInfo(std::string(_argv[idx + 1]));
+      data->setBirthBackground(std::string(_argv[idx + 1]));
     }
   }
   return 0;
@@ -117,7 +117,7 @@ int RuwatData::setParam(RuwatData::GROUP_t type, const std::string name){
  * Berfungsi untuk melakukan setup informasi latar belakang kelahiran.
  * @param info value.
  */
-void RuwatData::setBirthInfo(const std::string info){
+void RuwatData::setBirthBackground(const std::string info){
   this->kelahiran = info;
 }
 
@@ -157,7 +157,7 @@ std::string RuwatData::getName(){
  * Berfungsi untuk melakukan pengambilan data informasi latar belakang kelahiran.
  * @return string informasi kelahiran yang meliputi latar belakang atau tujuan kelahiran.
  */
-std::string RuwatData::getBirthInfo(){
+std::string RuwatData::getBirthBackground(){
   return this->kelahiran;
 }
 

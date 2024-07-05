@@ -63,7 +63,7 @@ class RuwatData {
      * Berfungsi untuk melakukan setup informasi latar belakang kelahiran.
      * @param info value.
      */
-    void setBirthInfo(const std::string info);
+    void setBirthBackground(const std::string info);
 
     /**
      * @brief Setter untuk informasi yadnya yang perlu dilakukan.
@@ -95,7 +95,7 @@ class RuwatData {
      * Berfungsi untuk melakukan pengambilan data informasi latar belakang kelahiran.
      * @return string informasi kelahiran yang meliputi latar belakang atau tujuan kelahiran.
      */
-    std::string getBirthInfo();
+    std::string getBirthBackground();
 
     /**
      * @brief Getter untuk mengambil informasi yadnya yang perlu dilakukan.
