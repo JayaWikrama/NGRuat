@@ -70,7 +70,7 @@ set_target_properties(${PROJECT_NAME}-lib PROPERTIES
 add_executable(${PROJECT_NAME} main/main.cpp)
 
 # Create Unit Test executable
-#add_executable(${PROJECT_NAME}-test test/pawukon-test.cpp test/wewaran-test.cpp test/wariga-test-common.cpp test/wariga-test-1945.cpp test/wariga-test-2024.cpp)
+add_executable(${PROJECT_NAME}-test test/data-test.cpp)
 
 # Include directories
 target_include_directories(${PROJECT_NAME}-lib PUBLIC
@@ -98,9 +98,8 @@ add_subdirectory(external/Balinese-Wariga EXCLUDE_FROM_ALL)
 add_subdirectory(external/TgBot EXCLUDE_FROM_ALL)
 
 # Link Unit Test executable with the library
-#target_link_libraries(${PROJECT_NAME}-test PRIVATE ${PROJECT_NAME}-lib)
-#target_link_libraries(${PROJECT_NAME}-test PUBLIC ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES})
-#target_link_libraries(${PROJECT_NAME}-test gtest_main)
+target_link_libraries(${PROJECT_NAME}-test PRIVATE ${PROJECT_NAME}-lib)
+target_link_libraries(${PROJECT_NAME}-test PUBLIC ${GTEST_LIBRARIES} WarigaBali-lib ${GTEST_MAIN_LIBRARIES} ${SQLITE3_LIBRARIES})
 
 # Set compiler and linker flags
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
@@ -110,7 +109,7 @@ set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -O3")
 set(CMAKE_USE_RELATIVE_PATHS OFF)
 
 # Add test
-#add_test(NAME ${PROJECT_NAME}_test COMMAND ${PROJECT_NAME}-test)
+add_test(NAME ${PROJECT_NAME}_test COMMAND ${PROJECT_NAME}-test)
 
 # Setup for package installer
 #install(TARGETS ${PROJECT_NAME}-lib
