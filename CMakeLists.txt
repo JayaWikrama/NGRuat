@@ -70,7 +70,7 @@ set_target_properties(${PROJECT_NAME}-lib PROPERTIES
 add_executable(${PROJECT_NAME} main/main.cpp)
 
 # Create Unit Test executable
-add_executable(${PROJECT_NAME}-test test/data-test.cpp test/document-test.cpp)
+add_executable(${PROJECT_NAME}-test test/data-test.cpp test/document-test.cpp test/ruwatan-test.cpp)
 
 # Include directories
 target_include_directories(${PROJECT_NAME}-lib PUBLIC
