@@ -8,6 +8,7 @@ class Ruwatan {
   private:
     std::string name;
     std::string birthDate;
+    std::string database;
   public:
     RuwatData ekaWara;
     RuwatData dwiWara;
@@ -32,6 +33,15 @@ class Ruwatan {
      * Berfungsi untuk melakukan release setiap memory yang dialokasikan.
      */
     ~Ruwatan();
+
+    /**
+     * @brief Setter untuk setup referensi database yang digunakan.
+     *
+     * Berfungsi untuk melakukan setup referensi database yang digunakan sebagai basis data.
+     * Method ini wajib dipanggil sebelum memanggil method __Ruwatan::setup__ jika ingin menggunakan referensi database custom.
+     * @param fileName nama file database (lengkap dengan directory path-nya).
+     */
+    void setDatabase(const std::string fileName);
 
     /**
      * @brief Setter untuk setup informasi nama dan data kelahiran orang yang akan diruat.
@@ -61,6 +71,14 @@ class Ruwatan {
      * @return string nama Sang Yajamana yang terakhir dimasukkan pada parameter method __Ruwatan::setup__
      */
     std::string getName();
+
+    /**
+     * @brief Getter untuk mengambil informasi nama file referensi database yang digunakan.
+     *
+     * Berfungsi untuk melakukan pengambilan informasi nama file referensi database yang digunakan sebagai basis data.
+     * @return string nama file referensi database yang digunakan sebagai basis data.
+     */
+    std::string getDatabase();
 
     /**
      * @brief Getter untuk mengambil informasi waktu kelahiran Sang Yajamana.

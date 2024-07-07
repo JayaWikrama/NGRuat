@@ -58,16 +58,8 @@ static const std::string saptaWaraLabel[] = {
  * Berfungsi untuk melakukan setup private data ke nilai default.
  */
 Ruwatan::Ruwatan(){
-  this->ekaWara.setDatabase(RUWATAN_DATABASE_REF);
-  this->dwiWara.setDatabase(RUWATAN_DATABASE_REF);
-  this->triWara.setDatabase(RUWATAN_DATABASE_REF);
-  this->caturWara.setDatabase(RUWATAN_DATABASE_REF);
-  this->pancaWara.setDatabase(RUWATAN_DATABASE_REF);
-  this->sadWara.setDatabase(RUWATAN_DATABASE_REF);
-  this->saptaWara.setDatabase(RUWATAN_DATABASE_REF);
-  this->astaWara.setDatabase(RUWATAN_DATABASE_REF);
-  this->sangaWara.setDatabase(RUWATAN_DATABASE_REF);
-  this->dasaWara.setDatabase(RUWATAN_DATABASE_REF);
+  this->database = RUWATAN_DATABASE_REF;
+  this->setDatabase(this->database);
 }
 
 /**
@@ -77,6 +69,27 @@ Ruwatan::Ruwatan(){
  */
 Ruwatan::~Ruwatan(){
   
+}
+
+/**
+ * @brief Setter untuk setup referensi database yang digunakan.
+ *
+ * Berfungsi untuk melakukan setup referensi database yang digunakan sebagai basis data.
+ * Method ini wajib dipanggil sebelum memanggil method __Ruwatan::setup__ jika ingin menggunakan referensi database custom.
+ * @param fileName nama file database (lengkap dengan directory path-nya).
+ */
+void Ruwatan::setDatabase(const std::string fileName){
+  this->database = fileName;
+  this->ekaWara.setDatabase(fileName);
+  this->dwiWara.setDatabase(fileName);
+  this->triWara.setDatabase(fileName);
+  this->caturWara.setDatabase(fileName);
+  this->pancaWara.setDatabase(fileName);
+  this->sadWara.setDatabase(fileName);
+  this->saptaWara.setDatabase(fileName);
+  this->astaWara.setDatabase(fileName);
+  this->sangaWara.setDatabase(fileName);
+  this->dasaWara.setDatabase(fileName);
 }
 
 /**
@@ -141,6 +154,16 @@ int Ruwatan::setup(const std::string name, const std::string wuku, const std::st
     ret += 70;
   }
   return ret;
+}
+
+/**
+ * @brief Getter untuk mengambil informasi nama file referensi database yang digunakan.
+ *
+ * Berfungsi untuk melakukan pengambilan informasi nama file referensi database yang digunakan sebagai basis data.
+ * @return string nama file referensi database yang digunakan sebagai basis data.
+ */
+std::string Ruwatan::getDatabase(){
+  return this->database;
 }
 
 /**
