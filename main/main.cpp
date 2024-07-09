@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <fstream>
 
 #include "ruwatan.hpp"
 #include "tgbot/tgbot.h"
@@ -111,7 +112,18 @@ int main(int argc, char **argv){
             ret = ruwat.setup(argv[1], argv[2], argv[3]);
         }
         if (!ret){
-            generateRuwatanDoc(RUWAT_TYPE_ALL, Document::DOCUMENT);
+            std::string docPayload = generateRuwatanDoc(RUWAT_TYPE_ALL, Document::DOCUMENT);
+            if (docPayload.length() > 0){
+                std::string fileName = ruwat.getName() + " - " + ruwat.getBirthInfo() + " - Lengkap";
+                std::transform(fileName.begin(), fileName.end(), fileName.begin(), ::toupper);
+                fileName += ".doc";
+                std::ofstream file(fileName);
+                if (!file.is_open()) {
+                  return 1;
+                }
+                file << docPayload << std::endl;
+                file.close();
+            }
         }
         else {
             std::cout << "Invalid Format dengan return: " << ret << std::endl;
