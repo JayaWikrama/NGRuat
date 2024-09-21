@@ -42,6 +42,7 @@ endif()
 # Find and Check Library
 find_package(PkgConfig REQUIRED)
 find_package(GTest REQUIRED)
+find_package(Boost REQUIRED system filesystem)
 pkg_check_modules(SQLITE3 REQUIRED sqlite3)
 
 # Specify the source files
@@ -92,14 +93,14 @@ add_dependencies(${PROJECT_NAME} TgBot)
 
 # Link the executable with the library
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}-lib WarigaBali-lib ${CMAKE_CURRENT_SOURCE_DIR}/build/external/TgBot/libTgBot.a)
-target_link_libraries(${PROJECT_NAME} PUBLIC ${SQLITE3_LIBRARIES} -lssl -lcrypto -lcurl -lpthread)
+target_link_libraries(${PROJECT_NAME} PUBLIC ${SQLITE3_LIBRARIES} -lssl -lcrypto -lcurl -lpthread Boost::system Boost::filesystem)
 
 add_subdirectory(external/Balinese-Wariga EXCLUDE_FROM_ALL)
 add_subdirectory(external/TgBot EXCLUDE_FROM_ALL)
 
 # Link Unit Test executable with the library
 target_link_libraries(${PROJECT_NAME}-test PRIVATE ${PROJECT_NAME}-lib)
-target_link_libraries(${PROJECT_NAME}-test PUBLIC ${GTEST_LIBRARIES} WarigaBali-lib ${GTEST_MAIN_LIBRARIES} ${SQLITE3_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}-test PUBLIC ${GTEST_LIBRARIES} WarigaBali-lib ${GTEST_MAIN_LIBRARIES} ${SQLITE3_LIBRARIES} Boost::system Boost::filesystem)
 
 # Set compiler and linker flags
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
