@@ -100,7 +100,7 @@ add_subdirectory(external/TgBot EXCLUDE_FROM_ALL)
 
 # Link Unit Test executable with the library
 target_link_libraries(${PROJECT_NAME}-test PRIVATE ${PROJECT_NAME}-lib)
-target_link_libraries(${PROJECT_NAME}-test PUBLIC ${GTEST_LIBRARIES} WarigaBali-lib ${GTEST_MAIN_LIBRARIES} ${SQLITE3_LIBRARIES} Boost::system Boost::filesystem)
+target_link_libraries(${PROJECT_NAME}-test PUBLIC ${GTEST_LIBRARIES} WarigaBali-lib ${GTEST_MAIN_LIBRARIES} ${SQLITE3_LIBRARIES} Boost::system Boost::filesystem -lpthread)
 
 # Set compiler and linker flags
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
