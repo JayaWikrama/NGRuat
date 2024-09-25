@@ -8,6 +8,14 @@
 
 Ruwatan ruwat;
 
+typedef enum _STEP_CREATION_t {
+    STEP_NONE = 0,
+    STEP_INPUT_YAJAMANA,
+    STEP_INPUT_PAWUKON,
+    STEP_INPUT_RAHINA,
+    STEP_GENERATE_DOC
+} STEP_CREATION_t;
+
 typedef enum _RUWAT_DATA_TYPE_t {
     RUWAT_TYPE_ALL = 0,
     RUWAT_TYPE_BEBANTEN,
@@ -18,6 +26,8 @@ RUWAT_DATA_TYPE_t ruwatType = RUWAT_TYPE_ALL;
 
 TgBot::ReplyKeyboardMarkup::Ptr contentType(new TgBot::ReplyKeyboardMarkup);
 TgBot::ReplyKeyboardMarkup::Ptr documentType(new TgBot::ReplyKeyboardMarkup);
+TgBot::ReplyKeyboardMarkup::Ptr pawukonList(new TgBot::ReplyKeyboardMarkup);
+TgBot::ReplyKeyboardMarkup::Ptr rahinaList(new TgBot::ReplyKeyboardMarkup);
 TgBot::InputFile fileTgBot;
 
 std::string fileTitle;
@@ -136,17 +146,70 @@ int main(int argc, char **argv){
     TgBot::Bot bot(argv[1]);
     createOneColumnKeyboard({"Banten dan Mantra", "Bebanten", "Mantra"}, contentType);
     createOneColumnKeyboard({"Markdown", "Document", "Back"}, documentType);
+    createOneColumnKeyboard({"Sinta",
+                             "Landep",
+                             "Ukir",
+                             "Kulantir",
+                             "Tolu",
+                             "Gumbreg",
+                             "Wariga",
+                             "Warigadean",
+                             "Julungwangi",
+                             "Sungsang",
+                             "Dungulan",
+                             "Kuningan",
+                             "Langkir",
+                             "Medangsia",
+                             "Pujut",
+                             "Pahang",
+                             "Krulut",
+                             "Merakih",
+                             "Tambir",
+                             "Medangkungan",
+                             "Matal",
+                             "Uye",
+                             "Menail",
+                             "Prangbakat",
+                             "Bala",
+                             "Ugu",
+                             "Wayang",
+                             "Kelawu",
+                             "Dukut",
+                             "Watugunung"
+                            }, pawukonList);
+    createOneColumnKeyboard({"Redite",
+                             "Soma",
+                             "Anggara",
+                             "Budha",
+                             "Wraspati",
+                             "Sukra",
+                             "Saniscara"
+                            }, rahinaList);
     bot.getEvents().onAnyMessage([&bot](TgBot::Message::Ptr message) {
+        static STEP_CREATION_t step = STEP_NONE;
+        static std::string name = "";
+        static std::string btime1 = "";
+        static std::string btime2 = "";
         if (StringTools::startsWith(message->text, "Ruwat") ||
             StringTools::startsWith(message->text, "ruwat") ||
             StringTools::startsWith(message->text, "ngeruwat") ||
             StringTools::startsWith(message->text, "Ngeruwat")
         ) {
-            std::string name = parseWord(message->text, 1);
-            std::string btime1 = parseWord(message->text, 2);
-            std::string btime2 = parseWord(message->text, 3);
+            name = parseWord(message->text, 1);
+            btime1 = parseWord(message->text, 2);
+            btime2 = parseWord(message->text, 3);
             int ret = 0;
-            if (btime2 == ""){
+            if (name == ""){
+                bot.getApi().sendMessage(message->chat->id, "Masukkan dan kirimkan nama Yajamana");
+                step = STEP_INPUT_YAJAMANA;
+                return;
+            }
+            else if (btime1 == ""){
+                bot.getApi().sendMessage(message->chat->id, "Pilih Wuku Kelahiran", nullptr, nullptr, pawukonList);
+                step = STEP_INPUT_PAWUKON;
+                return;
+            }
+            else if (btime2 == ""){
                 ret = ruwat.setup(name, btime1);
             }
             else {
@@ -155,9 +218,37 @@ int main(int argc, char **argv){
             if (!ret){
                 bot.getApi().sendMessage(message->chat->id, "Pilih Jenis Konten Ruwatan", nullptr, nullptr, contentType);
                 fileTitle = ruwat.getName() + " - " + ruwat.getBirthInfo();
+                step = STEP_GENERATE_DOC;
             }
             else {
                 bot.getApi().sendMessage(message->chat->id, "Invalid Arg\n\n Arg: Ruwat <name> <date> | Ruwat <name> <wuku> <rahina>");
+                step = STEP_NONE;
+            }
+            return;
+        }
+        else if (step == STEP_INPUT_YAJAMANA){
+            name = message->text;
+            bot.getApi().sendMessage(message->chat->id, "Pilih Wuku Kelahiran", nullptr, nullptr, pawukonList);
+            step = STEP_INPUT_PAWUKON;
+            return;
+        }
+        else if (step == STEP_INPUT_PAWUKON){
+            btime1 = message->text;
+            bot.getApi().sendMessage(message->chat->id, "Pilih Hari Kelahiran", nullptr, nullptr, rahinaList);
+            step = STEP_INPUT_RAHINA;
+            return;
+        }
+        else if (step == STEP_INPUT_RAHINA){
+            btime2 = message->text;
+            int ret = ruwat.setup(name, btime1, btime2);
+            if (!ret){
+                bot.getApi().sendMessage(message->chat->id, "Pilih Jenis Konten Ruwatan", nullptr, nullptr, contentType);
+                fileTitle = ruwat.getName() + " - " + ruwat.getBirthInfo();
+                step = STEP_GENERATE_DOC;
+            }
+            else {
+                bot.getApi().sendMessage(message->chat->id, "Gagal menentukan parameter");
+                step = STEP_NONE;
             }
             return;
         }
