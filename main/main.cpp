@@ -190,6 +190,7 @@ int main(int argc, char **argv){
         static std::string name = "";
         static std::string btime1 = "";
         static std::string btime2 = "";
+        std::cout << "Request from: " << std::to_string(message->chat->id) << ": " << message->text << std::endl;
         if (StringTools::startsWith(message->text, "Ruwat") ||
             StringTools::startsWith(message->text, "ruwat") ||
             StringTools::startsWith(message->text, "ngeruwat") ||
@@ -278,6 +279,7 @@ int main(int argc, char **argv){
             fileTgBot.mimeType = "text/utf-8";
             TgBot::InputFile::Ptr fPtr = std::make_shared<TgBot::InputFile>(fileTgBot);
             bot.getApi().sendDocument(message->chat->id, fPtr);
+            std::cout << "file " << fileTitle << " has been send" << std::endl;
             return;
         }
         else if (StringTools::startsWith(message->text, "Document")) {
@@ -288,6 +290,7 @@ int main(int argc, char **argv){
             fileTgBot.mimeType = "text/html";
             TgBot::InputFile::Ptr fPtr = std::make_shared<TgBot::InputFile>(fileTgBot);
             bot.getApi().sendDocument(message->chat->id, fPtr);
+            std::cout << "file " << fileTitle << " has been send" << std::endl;
             return;
         }
         else if (StringTools::startsWith(message->text, "Back")) {
